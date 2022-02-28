@@ -1,0 +1,32 @@
+body {
+    background-color: #e9e9e9;
+}
+.logo {
+    background: -webkit-linear-gradient(#444f5f8f, #374356);
+    font-weight: 700;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.search-field input{
+    color: dimgray;
+    padding-left: 15px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.search-field button{
+    border: none;
+    background: -webkit-linear-gradient(#444f5f8f, #374356);
+    color: white;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.card {
+    border-radius: 30px;
+}
+.card img {
+    height: 300px;
+}
