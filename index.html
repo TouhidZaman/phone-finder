@@ -19,19 +19,24 @@
         <section class="container">
             <!-- Search area  -->
             <div class="row mb-5">
-                <div class="col-9 col-md-7 col-lg-5 mx-auto">
-                    <div class="input-group search-field mb-3">
-                        <input id="searchInputField" type="text" class="form-control fs-4" placeholder="Type brand name" aria-label="Type brand name" aria-describedby="search-btn">
-                        <button onclick="getPhonesByBrand()" class="btn btn-outline-secondary fs-4" id="search-btn" type="button">Search</button>
+                <div class="col-10 col-md-7 col-lg-5 mx-auto">
+                    <div class="input-group search-field mb-md-3">
+                        <input id="searchInputField" type="text" class="form-control fs-5" placeholder="Type brand name" aria-label="Type brand name" aria-describedby="search-btn">
+                        <button onclick="getPhonesByBrand()" class="btn btn-outline-secondary fs-5" id="search-btn" type="button">Search</button>
                     </div>
                 </div>
               </div>
             <!--end of Search area  -->
 
+            <!-- end of phone details area  -->
+
             <!-- search results area  -->
             <div class="row mb-5">
-                <div class="col-10 col-md-10 mx-auto">
-                    <div id="phones-container" class="row row-cols-1 row-cols-md-3 g-5">
+                <div class="col-10 col-md-9 mx-auto">
+                    <div id="not-found-field" class="d-none">
+                        <h3 class="text-center text-danger">OPPS ! NOT FOUND</h3>
+                    </div>
+                    <div id="phones-container" class="row row-cols-1 row-cols-md-3 g-4 g-md-5">
                         <!-- phones will popup here -->
                     </div>
                 </div>
