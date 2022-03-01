@@ -4,7 +4,6 @@ var searchedPhonesData = [];
 //To clear search results
 const clearDisplay = (fieldId) => {
     const phonesContainerField = document.getElementById(fieldId);
-    // const phonesContainerField = document.getElementById('phones-container');
     phonesContainerField.textContent = '';
 }
 
@@ -28,9 +27,11 @@ const searchResultsHandler = data => {
     const searchInfoField = document.getElementById('searchInfoField');
     const moreButton =  document.getElementById('show-more-btn');
     const lessButton = document.getElementById('show-less-btn');
+    const phoneBannerImg = document.getElementById('phone-banner-img');
     searchInfoField.classList.add('d-none');
     moreButton.classList.add("d-none");
     lessButton.classList.add("d-none");
+    phoneBannerImg.classList.add("d-none");
 
     if(data.status === false) {
         notFoundField.classList.remove('d-none');
@@ -121,7 +122,7 @@ const showPhoneDetails = phone => {
                         </h4>
                         <p class="card-text">
                             <span class="fw-bold">Release Date:</span>
-                             ${phone.releaseDate ? phone.releaseDate : "Not Available"}
+                             ${phone.releaseDate ? phone.releaseDate : `<span class="text-danger">Not Available</span>`}
                         </p>
                         <p class="card-text">
                             <span class="fw-bold">Brand Name:</span> 
@@ -175,39 +176,11 @@ const loadFeatures = (fieldId, features) => {
             </td>
         `;
         featuresContainer.appendChild(tr)
-    }) : featuresContainer.parentNode.style.display = 'none';
+    }) : featuresContainer.innerHTML = `
+        <th scope="row">Not Found</th>
+        <td colspan="2">
+            <p class="card-text">Others features not available</p>
+        </td>
+    `;
+    // }) : featuresContainer.parentNode.style.display = 'none';
 }
-
-// phoneCard.innerHTML = `
-//         <div class="card shadow p-4">
-//             <div class="p-2 d-flex">
-//                 <div class="">
-//                     <img src="${phone.image}" class="img-fluid" alt="phone-img">
-//                 </div>
-//                 <div class="ps-md-4">
-//                     <h5 class="card-title">Name: ${phone.name}</h5>
-//                     <p class="card-text">Release Date: ${phone.releaseDate ? phone.releaseDate : "Not Available"}</p>
-//                     <p class="card-text">Brand: ${phone.brand}</p>
-//                 </div>
-//             </div>
-//             <div class="card-body">
-//                 <table class="table main-features">
-//                     <thead>
-//                         <tr>
-//                             <th scope="col" colspan="3">Main Features</th>
-//                         </tr>
-//                     </thead>
-//                     <tbody id="main-features-container"></tbody>
-//                 </table>
-
-//                 <table class="table others-features">
-//                     <thead>
-//                         <tr>
-//                             <th scope="col" colspan="3">Others Features</th>
-//                         </tr>
-//                     </thead>
-//                     <tbody id="other-features-container"></tbody>
-//                 </table>
-//             </div>
-//         </div>
-//     `; 
