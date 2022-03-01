@@ -1,48 +1,99 @@
+// Storing searched data to contro number o resuts to display 
+var searchedPhonesData = [];
+
+//To clear search results
+const clearDisplay = (fieldId) => {
+    const phonesContainerField = document.getElementById(fieldId);
+    // const phonesContainerField = document.getElementById('phones-container');
+    phonesContainerField.textContent = '';
+}
+
 //To fetch Searched Phones from API
-const getPhonesByBrand = () => {
+const getPhonesBySearch = () => {
     const searchInputField = document.getElementById('searchInputField');
     // getting lowercase search text to improve search results
     const searchText = searchInputField.value.toLowerCase(); 
     fetch(`https://openapi.programming-hero.com/api/phones?search=${searchText}`)
         .then(response => response.json())
-        .then(data => loadPhones(data));
-    console.log(searchText)
+        .then(data => searchResultsHandler(data));
+    // console.log(searchText)
 }
 
-//Loading phones data to UI
-const loadPhones = data => {
+// Handling search result data 
+const searchResultsHandler = data => {
+    clearDisplay('showPhoneDetailsField');
+    clearDisplay('phones-container');
+
     const notFoundField = document.getElementById('not-found-field');
-    const phonesContainerField = document.getElementById('phones-container');
-    phonesContainerField.textContent = '';
     
     if(data.status === false) {
         notFoundField.classList.remove('d-none');
-        notFoundField.classList.add('d-block');
     }
     else {
-        notFoundField.classList.add('d-none');
-        const phones =  data.data;
-        phones.forEach(phone => {
-            const colCard = document.createElement('div');
-            colCard.innerHTML = `
-                <div class="card py-4 b-none shadow h-100">
-                    <div class="py-2 d-flex justify-content-center">
-                        <img src="${phone.image}" class="img-fluid" alt="phone-img">
-                    </div>
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Name: ${phone.phone_name}</h5>
-                        <p class="card-text">Brand: ${phone.brand}</p>
-                    </div>
-                    <div class="py-2 d-flex justify-content-center">
-                        <button onclick="loadPhoneBySlug('${phone.slug}')" class="btn btn-secondary rounded-pill px-4">Show Details</button>
-                    </div>
-                </div>
-            `;
-            colCard.classList.add('col');
-            phonesContainerField.appendChild(colCard);
-            console.log(phone)
-        });
+        searchedPhonesData = data.data; // storing search data to global variable
+        //search info field
+        let resultCount = searchedPhonesData.length;
+        const searchInfoField = document.getElementById('searchInfoField');
+        searchInfoField.innerText = `Total ${resultCount}+ Results Found. Showing: (${resultCount < 20 ? resultCount : "20"})`;
+        searchInfoField.classList.remove('d-none');
+        searchInfoField.classList.add('d-block');
+        
+        notFoundField.classList.add('d-none');//to remove existing not found message
+        
+        const phones =  searchedPhonesData.slice(0, 20); // slice will take only first 20 results
+        loadPhones(phones);
+        const moreButton =  document.getElementById('show-more-btn');
+        if(searchedPhonesData.length > 20) {
+            moreButton.classList.remove("d-none");
+        }
+        else {
+            moreButton.classList.add("d-none");
+        }
     }
+}
+
+//Loading phones data to UI
+const loadPhones = phones => {
+    const phonesContainerField = document.getElementById('phones-container');
+    // phonesContainerField.textContent = '';
+    phones.forEach(phone => {
+        const colCard = document.createElement('div');
+        colCard.innerHTML = `
+            <div class="card py-4 b-none shadow h-100">
+                <div class="py-2 d-flex justify-content-center">
+                    <img src="${phone.image}" class="img-fluid" alt="phone-img">
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Name: ${phone.phone_name}</h5>
+                    <p class="card-text">Brand: ${phone.brand}</p>
+                </div>
+                <div class="py-2 d-flex justify-content-center">
+                    <button onclick="loadPhoneBySlug('${phone.slug}')" class="btn btn-secondary rounded-pill px-4">Show Details</button>
+                </div>
+            </div>
+        `;
+        colCard.classList.add('col');
+        phonesContainerField.appendChild(colCard);
+    });
+}
+
+//handling show more results
+const showMoreResults = (event) => {
+    const phones = searchedPhonesData.slice(20, );
+    loadPhones(phones);
+    event.target.classList.add('d-none');
+    const lessButton = document.getElementById('show-less-btn');
+    lessButton.classList.remove('d-none')
+}
+
+//handling show less results
+const showLessResults = (event) => {
+    clearDisplay('phones-container');
+    const phones = searchedPhonesData.slice(0, 20);
+    loadPhones(phones);
+    event.target.classList.add('d-none');
+    const moreButton = document.getElementById('show-more-btn');
+    moreButton.classList.remove('d-none')
 }
 
 //To fetch a specique phone using slug Id
@@ -55,8 +106,7 @@ const loadPhoneBySlug = slug => {
 
 // Loading phone Details to UI
 const showPhoneDetails = phone => {
-    const showPhoneDetailsField = document.getElementById('showPhoneDetailsField');
-    showPhoneDetailsField.textContent = '';
+    clearDisplay('showPhoneDetailsField');
     const phoneCard = document.createElement('div');
     phoneCard.innerHTML = `
         <div class="card shadow p-4 mx-auto">
