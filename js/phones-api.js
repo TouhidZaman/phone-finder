@@ -25,15 +25,18 @@ const searchResultsHandler = data => {
     clearDisplay('phones-container');
 
     const notFoundField = document.getElementById('not-found-field');
+    const searchInfoField = document.getElementById('searchInfoField');
+    const moreButton =  document.getElementById('show-more-btn');
     
     if(data.status === false) {
         notFoundField.classList.remove('d-none');
+        searchInfoField.classList.add('d-none');
+        moreButton.classList.add("d-none");
     }
     else {
         searchedPhonesData = data.data; // storing search data to global variable
         //search info field
         let resultCount = searchedPhonesData.length;
-        const searchInfoField = document.getElementById('searchInfoField');
         searchInfoField.innerText = `Total ${resultCount}+ Results Found. Showing: (${resultCount < 20 ? resultCount : "20"})`;
         searchInfoField.classList.remove('d-none');
         searchInfoField.classList.add('d-block');
@@ -42,7 +45,6 @@ const searchResultsHandler = data => {
         
         const phones =  searchedPhonesData.slice(0, 20); // slice will take only first 20 results
         loadPhones(phones);
-        const moreButton =  document.getElementById('show-more-btn');
         if(searchedPhonesData.length > 20) {
             moreButton.classList.remove("d-none");
         }
@@ -109,35 +111,47 @@ const showPhoneDetails = phone => {
     clearDisplay('showPhoneDetailsField');
     const phoneCard = document.createElement('div');
     phoneCard.innerHTML = `
-        <div class="card shadow p-4 mx-auto">
-            <div class="p-2 d-flex">
-                <div class="">
-                    <img src="${phone.image}" class="img-fluid" alt="phone-img">
+        <div class="card shadow p-4 mt-4 mt-md-5">
+            <div class="p-2 row">
+                <div class="col-lg-5 pb-4">
+                    <img src="${phone.image}" class="h-auto w-100 py-2" alt="phone-img">
+                    <div class="p-2">
+                        <h4 class="card-title">
+                            <span class="fw-bold">Name:</span> 
+                            ${phone.name}
+                        </h4>
+                        <p class="card-text">
+                            <span class="fw-bold">Release Date:</span>
+                             ${phone.releaseDate ? phone.releaseDate : "Not Available"}
+                        </p>
+                        <p class="card-text">
+                            <span class="fw-bold">Brand Name:</span> 
+                            ${phone.brand}
+                        </p>
+                    </div>
                 </div>
-                <div class="ps-md-4">
-                    <h5 class="card-title">Name: ${phone.name}</h5>
-                    <p class="card-text">Release Date: ${phone.releaseDate ? phone.releaseDate : "Not Available"}</p>
-                    <p class="card-text">Brand: ${phone.brand}</p>
+                <div class="ps-md-4 col-lg-7">
+                    <div class="table-responsive">
+                        <table class="table main-features">
+                            <thead>
+                                <tr>
+                                    <th scope="col" colspan="3">Main Features</th>
+                                </tr>
+                            </thead>
+                            <tbody id="main-features-container"></tbody>
+                        </table>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table others-features">
+                            <thead>
+                                <tr>
+                                    <th scope="col" colspan="3">Others Features</th>
+                                </tr>
+                            </thead>
+                            <tbody id="other-features-container"></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <table class="table main-features">
-                    <thead>
-                        <tr>
-                            <th scope="col" colspan="3">Main Features</th>
-                        </tr>
-                    </thead>
-                    <tbody id="main-features-container"></tbody>
-                </table>
-
-                <table class="table others-features">
-                    <thead>
-                        <tr>
-                            <th scope="col" colspan="3">Others Features</th>
-                        </tr>
-                    </thead>
-                    <tbody id="other-features-container"></tbody>
-                </table>
             </div>
         </div>
     `; 
@@ -145,6 +159,7 @@ const showPhoneDetails = phone => {
     showPhoneDetailsField.appendChild(phoneCard);
     loadFeatures('main-features-container', phone.mainFeatures);
     loadFeatures('other-features-container', phone.others);
+    showPhoneDetailsField.scrollIntoView(); //jumping to the result field
 }
 
 //Dynamically pusing features to Phone Details UI
@@ -163,3 +178,37 @@ const loadFeatures = (fieldId, features) => {
         featuresContainer.appendChild(tr)
     }) : featuresContainer.parentNode.style.display = 'none';
 }
+
+// phoneCard.innerHTML = `
+//         <div class="card shadow p-4">
+//             <div class="p-2 d-flex">
+//                 <div class="">
+//                     <img src="${phone.image}" class="img-fluid" alt="phone-img">
+//                 </div>
+//                 <div class="ps-md-4">
+//                     <h5 class="card-title">Name: ${phone.name}</h5>
+//                     <p class="card-text">Release Date: ${phone.releaseDate ? phone.releaseDate : "Not Available"}</p>
+//                     <p class="card-text">Brand: ${phone.brand}</p>
+//                 </div>
+//             </div>
+//             <div class="card-body">
+//                 <table class="table main-features">
+//                     <thead>
+//                         <tr>
+//                             <th scope="col" colspan="3">Main Features</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody id="main-features-container"></tbody>
+//                 </table>
+
+//                 <table class="table others-features">
+//                     <thead>
+//                         <tr>
+//                             <th scope="col" colspan="3">Others Features</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody id="other-features-container"></tbody>
+//                 </table>
+//             </div>
+//         </div>
+//     `; 
