@@ -57,18 +57,72 @@ const showPhoneDetails = phone => {
     showPhoneDetailsField.textContent = '';
     const phoneCard = document.createElement('div');
     phoneCard.innerHTML = `
-        <div class="card p-4 w-75 mx-auto">
-            <div class="py-2">
-                <img src="${phone.image}" class="img-fluid" alt="phone-img">
+        <div class="card shadow p-4 mx-auto">
+            <div class="p-2 d-flex">
+                <div class="">
+                    <img src="${phone.image}" class="img-fluid" alt="phone-img">
+                </div>
+                <div class="ps-md-4">
+                    <h5 class="card-title">Name: ${phone.name}</h5>
+                    <p class="card-text">Release Date: ${phone.releaseDate ? phone.releaseDate : "Not Available"}</p>
+                    <p class="card-text">Brand: ${phone.brand}</p>
+                </div>
             </div>
             <div class="card-body">
-                <h5 class="card-title">Name: ${phone.name}</h5>
-                <p class="card-text">Brand: ${phone.brand}</p>
-                <p class="card-text">Sensors: ${phone.mainFeatures.sensors?.forEach(sensor => {
-                    console.log(sensor);
-                })}</p>
+                <table class="table main-features">
+                    <thead>
+                        <tr>
+                            <th scope="col" colspan="3">Main Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Storage</th>
+                            <td colspan="2"><p class="card-text">${phone.mainFeatures.storage}</p></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Display Size</th>
+                            <td colspan="2"><p class="card-text">${phone.mainFeatures.displaySize}</p></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Chipset</th>
+                            <td colspan="2"><p class="card-text">${phone.mainFeatures.chipSet}</p></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Memory</th>
+                            <td colspan="2"><p class="card-text">${phone.mainFeatures.memory}</p></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Sensors</th>
+                            <td colspan="2"><p class="card-text">${phone.mainFeatures.sensors?.join(', ')}</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table others-features">
+                    <thead>
+                        <tr>
+                            <th scope="col" colspan="3">Others Features</th>
+                        </tr>
+                    </thead>
+                    <tbody id="other-features-container"></tbody>
+                </table>
             </div>
         </div>
-    `;
+    `; 
+
     showPhoneDetailsField.appendChild(phoneCard);
+
+    //Handling Others Features
+    const otherFeaturesContainer = document.getElementById('other-features-container');
+    const others = phone.others;
+    others ? Object.keys(others).forEach(featureName => {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+            <th scope="row">${featureName}</th>
+            <td colspan="2"><p class="card-text">${others[featureName]}</p></td>
+        `;
+        otherFeaturesContainer.appendChild(tr)
+    }) : otherFeaturesContainer.parentNode.style.display = 'none';
+    
 }
