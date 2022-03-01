@@ -27,11 +27,13 @@ const searchResultsHandler = data => {
     const notFoundField = document.getElementById('not-found-field');
     const searchInfoField = document.getElementById('searchInfoField');
     const moreButton =  document.getElementById('show-more-btn');
-    
+    const lessButton = document.getElementById('show-less-btn');
+    searchInfoField.classList.add('d-none');
+    moreButton.classList.add("d-none");
+    lessButton.classList.add("d-none");
+
     if(data.status === false) {
         notFoundField.classList.remove('d-none');
-        searchInfoField.classList.add('d-none');
-        moreButton.classList.add("d-none");
     }
     else {
         searchedPhonesData = data.data; // storing search data to global variable
@@ -47,9 +49,6 @@ const searchResultsHandler = data => {
         loadPhones(phones);
         if(searchedPhonesData.length > 20) {
             moreButton.classList.remove("d-none");
-        }
-        else {
-            moreButton.classList.add("d-none");
         }
     }
 }
