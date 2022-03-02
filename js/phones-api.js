@@ -20,6 +20,13 @@ const setDisplayNone = (fieldId, isNone) => {
 
 //To fetch Searched Phones from API
 const getPhonesBySearch = () => {
+    clearDisplay('showPhoneDetailsField');
+    clearDisplay('phones-container');
+    
+    searchInfoField.classList.add('d-none');
+    setDisplayNone('phone-banner-img', true); //to remove existing banner
+    setDisplayNone('show-more-btn', true); //to remove existing more button
+    setDisplayNone('show-less-btn', true); //to remove existing less button
     setDisplayNone('spinner', false); //Showing spinners
 
     const searchInputField = document.getElementById('searchInputField');
@@ -37,15 +44,7 @@ const getPhonesBySearch = () => {
 
 // Handling search result data 
 const searchResultsHandler = resultsData => {
-    clearDisplay('showPhoneDetailsField');
-    clearDisplay('phones-container');
-    
-    searchInfoField.classList.add('d-none');
-    setDisplayNone('phone-banner-img', true); //to remove existing banner
-    setDisplayNone('show-more-btn', true); //to remove existing more button
-    setDisplayNone('show-less-btn', true); //to remove existing less button
     setDisplayNone('spinner', true); //Hiding spinners
-    
     
     if(resultsData.status === false) {
         errorMessageField.innerText="Opps, Not Found!";
@@ -96,25 +95,6 @@ const loadPhones = phones => {
         colCard.classList.add('col');
         phonesContainerField.appendChild(colCard);
     });
-}
-
-//handling show more results
-const showMoreResults = (event) => {
-    showingResultCount = resultCount; //updating showing count
-    const phones = searchedPhonesData.slice(20, );
-    loadPhones(phones);
-    event.target.classList.add('d-none');
-    setDisplayNone('show-less-btn', false);
-}
-
-//handling show less results
-const showLessResults = (event) => {
-    clearDisplay('phones-container');
-    showingResultCount = 20; //updating showing count
-    const phones = searchedPhonesData.slice(0, 20);
-    loadPhones(phones);
-    event.target.classList.add('d-none');
-    setDisplayNone('show-more-btn', false);
 }
 
 //To fetch a specique phone using slug Id
@@ -214,4 +194,23 @@ const loadFeatures = (fieldId, features) => {
         </td>
     `;
     // }) : featuresContainer.parentNode.style.display = 'none';
+}
+
+//handling show more results
+const showMoreResults = (event) => {
+    showingResultCount = resultCount; //updating showing count
+    const phones = searchedPhonesData.slice(20, );
+    loadPhones(phones);
+    event.target.classList.add('d-none');
+    setDisplayNone('show-less-btn', false);
+}
+
+//handling show less results
+const showLessResults = (event) => {
+    clearDisplay('phones-container');
+    showingResultCount = 20; //updating showing count
+    const phones = searchedPhonesData.slice(0, 20);
+    loadPhones(phones);
+    event.target.classList.add('d-none');
+    setDisplayNone('show-more-btn', false);
 }
