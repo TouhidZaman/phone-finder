@@ -1,10 +1,21 @@
-// Storing searched data to contro number o resuts to display 
+// Storing searched data and showing count data to display 
 var searchedPhonesData = [];
+var resultCount = 0;
+var showingResultCount = 0;
+
+const errorMessageField = document.getElementById('error-message-field');
+const searchInfoField = document.getElementById('searchInfoField');
 
 //To clear search results
 const clearDisplay = (fieldId) => {
     const phonesContainerField = document.getElementById(fieldId);
     phonesContainerField.textContent = '';
+}
+
+//To set or remove display none in a Field
+const setDisplayNone = (fieldId, isNone) => {
+    const field = document.getElementById(fieldId);
+    isNone ? field.classList.add('d-none') : field.classList.remove('d-none');
 }
 
 //To fetch Searched Phones from API
@@ -13,43 +24,41 @@ const getPhonesBySearch = () => {
     // getting lowercase search text to improve search results
     const searchText = searchInputField.value.toLowerCase(); 
     fetch(`https://openapi.programming-hero.com/api/phones?search=${searchText}`)
-        .then(response => response.json())
-        .then(data => searchResultsHandler(data));
-    // console.log(searchText)
+        .then(response => response.ok ? response.json() : Promise.reject(response.status))
+        .then(data => searchResultsHandler(data))
+        .catch(error => {
+            errorMessageField.innerText=`Opps, something went wrong! status: ${error}`;
+            errorMessageField.classList.remove('d-none');
+            setDisplayNone('phone-banner-img', true);
+        });
 }
 
 // Handling search result data 
-const searchResultsHandler = data => {
+const searchResultsHandler = resultsData => {
     clearDisplay('showPhoneDetailsField');
     clearDisplay('phones-container');
 
-    const notFoundField = document.getElementById('not-found-field');
-    const searchInfoField = document.getElementById('searchInfoField');
-    const moreButton =  document.getElementById('show-more-btn');
-    const lessButton = document.getElementById('show-less-btn');
-    const phoneBannerImg = document.getElementById('phone-banner-img');
     searchInfoField.classList.add('d-none');
-    moreButton.classList.add("d-none");
-    lessButton.classList.add("d-none");
-    phoneBannerImg.classList.add("d-none");
-
-    if(data.status === false) {
-        notFoundField.classList.remove('d-none');
+    setDisplayNone('phone-banner-img', true); //to remove existing banner
+    setDisplayNone('show-more-btn', true); //to remove existing more button
+    setDisplayNone('show-less-btn', true); //to remove existing less button
+    
+    if(resultsData.status === false) {
+        errorMessageField.innerText="Opps, Not Found!";
+        errorMessageField.classList.remove('d-none');
     }
     else {
-        searchedPhonesData = data.data; // storing search data to global variable
-        //search info field
-        let resultCount = searchedPhonesData.length;
-        searchInfoField.innerText = `Total ${resultCount}+ Results Found. Showing: (${resultCount < 20 ? resultCount : "20"})`;
-        searchInfoField.classList.remove('d-none');
-        searchInfoField.classList.add('d-block');
+        searchedPhonesData = resultsData.data; // storing search data to global variable
+        errorMessageField.classList.add('d-none');//to remove existing not found message
         
-        notFoundField.classList.add('d-none');//to remove existing not found message
+        // calculating search result count 
+        resultCount = searchedPhonesData.length;
+        resultCount < 20 ? showingResultCount = resultCount : showingResultCount = 20; //updating showing count
         
         const phones =  searchedPhonesData.slice(0, 20); // slice will take only first 20 results
         loadPhones(phones);
         if(searchedPhonesData.length > 20) {
-            moreButton.classList.remove("d-none");
+            setDisplayNone('show-more-btn', false);
         }
     }
 }
@@ -57,6 +66,12 @@ const searchResultsHandler = data => {
 //Loading phones data to UI
 const loadPhones = phones => {
     const phonesContainerField = document.getElementById('phones-container');
+    
+    //handling search info field
+    searchInfoField.innerText = `Total ${resultCount}+ Results Found. Showing: (${showingResultCount})`;
+    searchInfoField.classList.remove('d-none');
+    
+    // phones[3].slug = 'test-me'; //For phone details not found test
     // phonesContainerField.textContent = '';
     phones.forEach(phone => {
         const colCard = document.createElement('div');
@@ -81,81 +96,90 @@ const loadPhones = phones => {
 
 //handling show more results
 const showMoreResults = (event) => {
+    showingResultCount = resultCount; //updating showing count
     const phones = searchedPhonesData.slice(20, );
     loadPhones(phones);
     event.target.classList.add('d-none');
-    const lessButton = document.getElementById('show-less-btn');
-    lessButton.classList.remove('d-none')
+    setDisplayNone('show-less-btn', false);
 }
 
 //handling show less results
 const showLessResults = (event) => {
     clearDisplay('phones-container');
+    showingResultCount = 20; //updating showing count
     const phones = searchedPhonesData.slice(0, 20);
     loadPhones(phones);
     event.target.classList.add('d-none');
-    const moreButton = document.getElementById('show-more-btn');
-    moreButton.classList.remove('d-none')
+    setDisplayNone('show-more-btn', false);
 }
 
 //To fetch a specique phone using slug Id
 const loadPhoneBySlug = slug => {
+    clearDisplay('showPhoneDetailsField');
+    errorMessageField.classList.add('d-none');
     const url = `https://openapi.programming-hero.com/api/phone/${slug}`;
     fetch(url)
         .then(response => response.json())
-        .then(data => showPhoneDetails(data.data))
+        .then(data => showPhoneDetails(data))
+        .catch(error => {
+            errorMessageField.innerText= `404! Phone details not found`;
+            errorMessageField.classList.remove('d-none');
+            errorMessageField.scrollIntoView();
+        });
 }
 
 // Loading phone Details to UI
-const showPhoneDetails = phone => {
-    clearDisplay('showPhoneDetailsField');
+const showPhoneDetails = phoneData => {
     const phoneCard = document.createElement('div');
-    phoneCard.innerHTML = `
-        <div class="card shadow p-4 mt-4 mt-md-5">
-            <div class="p-2 row">
-                <div class="col-lg-5 pb-4">
-                    <img src="${phone.image}" class="h-auto w-100 py-2" alt="phone-img">
-                    <div class="p-2">
-                        <h4 class="card-title">
-                            <span class="fw-bold">Name:</span> 
-                            ${phone.name}
-                        </h4>
-                        <p class="card-text">
-                            <span class="fw-bold">Release Date:</span>
-                             ${phone.releaseDate ? phone.releaseDate : `<span class="text-danger">Not Available</span>`}
-                        </p>
-                        <p class="card-text">
-                            <span class="fw-bold">Brand Name:</span> 
-                            ${phone.brand}
-                        </p>
+
+    if(phoneData.status !== false) {
+        phone = phoneData.data;
+        phoneCard.innerHTML = `
+            <div class="card shadow p-4 mt-4 mt-md-5">
+                <div class="p-2 row">
+                    <div class="col-lg-5 pb-4">
+                        <img src="${phone.image}" class="h-auto w-100 py-2" alt="phone-img">
+                        <div class="p-2">
+                            <h4 class="card-title">
+                                <span class="fw-bold">Name:</span> 
+                                ${phone.name}
+                            </h4>
+                            <p class="card-text">
+                                <span class="fw-bold">Release Date:</span>
+                                ${phone.releaseDate ? phone.releaseDate : `<span class="text-danger">Not Available</span>`}
+                            </p>
+                            <p class="card-text">
+                                <span class="fw-bold">Brand Name:</span> 
+                                ${phone.brand}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="ps-md-4 col-lg-7">
-                    <div class="table-responsive">
-                        <table class="table main-features">
-                            <thead>
-                                <tr>
-                                    <th scope="col" colspan="3">Main Features</th>
-                                </tr>
-                            </thead>
-                            <tbody id="main-features-container"></tbody>
-                        </table>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table others-features">
-                            <thead>
-                                <tr>
-                                    <th scope="col" colspan="3">Others Features</th>
-                                </tr>
-                            </thead>
-                            <tbody id="other-features-container"></tbody>
-                        </table>
+                    <div class="ps-md-4 col-lg-7">
+                        <div class="table-responsive">
+                            <table class="table main-features">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" colspan="3">Main Features</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="main-features-container"></tbody>
+                            </table>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table others-features">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" colspan="3">Others Features</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="other-features-container"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `; 
-
+        `; 
+    }
     showPhoneDetailsField.appendChild(phoneCard);
     loadFeatures('main-features-container', phone.mainFeatures);
     loadFeatures('other-features-container', phone.others);
