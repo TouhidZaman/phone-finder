@@ -20,6 +20,8 @@ const setDisplayNone = (fieldId, isNone) => {
 
 //To fetch Searched Phones from API
 const getPhonesBySearch = () => {
+    setDisplayNone('spinner', false); //Showing spinners
+
     const searchInputField = document.getElementById('searchInputField');
     // getting lowercase search text to improve search results
     const searchText = searchInputField.value.toLowerCase(); 
@@ -37,11 +39,13 @@ const getPhonesBySearch = () => {
 const searchResultsHandler = resultsData => {
     clearDisplay('showPhoneDetailsField');
     clearDisplay('phones-container');
-
+    
     searchInfoField.classList.add('d-none');
     setDisplayNone('phone-banner-img', true); //to remove existing banner
     setDisplayNone('show-more-btn', true); //to remove existing more button
     setDisplayNone('show-less-btn', true); //to remove existing less button
+    setDisplayNone('spinner', true); //Hiding spinners
+    
     
     if(resultsData.status === false) {
         errorMessageField.innerText="Opps, Not Found!";
@@ -116,7 +120,9 @@ const showLessResults = (event) => {
 //To fetch a specique phone using slug Id
 const loadPhoneBySlug = slug => {
     clearDisplay('showPhoneDetailsField');
+    setDisplayNone('spinner', false); //Showing spinners
     errorMessageField.classList.add('d-none');
+    
     const url = `https://openapi.programming-hero.com/api/phone/${slug}`;
     fetch(url)
         .then(response => response.json())
@@ -130,6 +136,7 @@ const loadPhoneBySlug = slug => {
 
 // Loading phone Details to UI
 const showPhoneDetails = phoneData => {
+    setDisplayNone('spinner', true); //Hiding spinners
     const phoneCard = document.createElement('div');
 
     if(phoneData.status !== false) {
